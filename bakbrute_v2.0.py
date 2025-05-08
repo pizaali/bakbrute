@@ -9,7 +9,7 @@ import aiofiles
 from tqdm import tqdm
 from fake_useragent import UserAgent
 
-# 禁用SSL警告
+
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
@@ -84,12 +84,10 @@ async def request_target(session, sem, target_url, user_agent, init_size, output
             async with session.get(target_url, headers={'User-Agent': user_agent}, ssl=False) as response:
                 content = await response.read()
                 if (len(content) != init_size and response.status == 200) and len(content) != 0:
-                    # 使用tqdm.write确保输出不被进度条打断
                     pbar.write(Fore.WHITE + f'[*] {target_url}')
                     pbar.write(Fore.WHITE + '==> status: ' + Fore.GREEN + 'success')
                     pbar.write(Fore.WHITE + '==> code: ' + Fore.GREEN + '200')
                     pbar.write(Fore.WHITE + '==> size: ' + Fore.GREEN + f'{convert_bytes_extended(len(content))}')
-                    # 异步写入文件
                     async with aiofiles.open(output_file, 'a', encoding='utf-8') as f:
                         await f.write(f'[200] {target_url} {convert_bytes_extended(len(content))}\n')
         except Exception as e:
